@@ -1,23 +1,39 @@
-import logo from './logo.svg';
 import './App.css';
+import {useState, useEffect} from 'react'
+
 
 function App() {
+  const loadExchangeRate = async () => {
+    const result = await fetch('https://api.coindesk.com/v1/bpi/currentprice.json')
+    const dataReceived = await result.json()
+    console.log(dataReceived)
+    setExchangeRateData(dataReceived)
+  }
+ useEffect( () => {
+  console.log("Start loading data ...")
+  loadExchangeRate()
+ }, [])
+  const [exchangeRateData, setExchangeRateData] = useState({})
+  if (!exchangeRateData.time) {
+    return (
+      <div>Loading ...</div>
+    )
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Exchange Rate Data</h1>
+        <div>Updated: {exchangeRateData.time.updated}</div>
+        <div>{exchangeRateData.chartName}</div>
+        <div>
+          {Object.keys(exchangeRateData.bpi).map((currency)=>{
+            return (
+              <div key={currency}>{currency}: {exchangeRateData.bpi[currency].rate}</div>
+            )
+          })}
+        </div>
+
+
     </div>
   );
 }
